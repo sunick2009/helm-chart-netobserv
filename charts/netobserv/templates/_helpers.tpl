@@ -7,6 +7,8 @@ Expand the name of the chart.
 
 {{/*
 Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
 */}}
 {{- define "netobserv.fullname" -}}
 {{- if .Values.fullnameOverride }}
@@ -25,20 +27,20 @@ Create a default fully qualified app name.
 Create chart name and version as used by the chart label.
 */}}
 {{- define "netobserv.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
 
 {{/*
 Common labels
 */}}
 {{- define "netobserv.labels" -}}
 helm.sh/chart: {{ include "netobserv.chart" . }}
-app: {{ include "netobserv.name" . }}
 {{ include "netobserv.selectorLabels" . }}
-app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
-version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
+{{- end }}
 
 {{/*
 Selector labels
@@ -46,4 +48,15 @@ Selector labels
 {{- define "netobserv.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "netobserv.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end -}}
+{{- end }}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "netobserv.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "netobserv.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}

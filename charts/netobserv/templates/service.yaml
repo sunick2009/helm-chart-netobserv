@@ -1,27 +1,15 @@
-{{- if .Values.service.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "netobserv.name" . }}
+  name: {{ include "netobserv.fullname" . }}
   labels:
     {{- include "netobserv.labels" . | nindent 4 }}
-    {{- if .Values.service.labels }}
-    {{- toYaml .Values.service.labels  | nindent 4 }}
-    {{- end }}
-  annotations:
-    {{- toYaml .Values.service.annotations | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - name: udp
-      port: {{ .Values.service.port }}
-      {{- if .Values.service.targetPort }}
-      targetPort: {{ .Values.service.targetPort }}
-      {{- end }}
+    - port: {{ .Values.service.port }}
+      targetPort: 9995
       protocol: UDP
-      {{- if .Values.service.nodePort }}
-      nodePort: {{ .Values.service.nodePort }}
-      {{- end }}
+      name: udp
   selector:
     {{- include "netobserv.selectorLabels" . | nindent 4 }}
-{{- end }}

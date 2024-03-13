@@ -1,28 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "netobserv.name" . }}
-  annotations:
-    {{- if .Values.deployment.annotations }}
-    {{- toYaml .Values.deployment.annotations | nindent 4 }}
-    {{- end }}
+  name: {{ include "netobserv.fullname" . }}
   labels:
     {{- include "netobserv.labels" . | nindent 4 }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  strategy:
-    type: {{ .Values.strategy.type }}
-    {{- if eq .Values.strategy.type "RollingUpdate" }}
-    rollingUpdate:
-      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
-      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
-    {{- end }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "netobserv.selectorLabels" . | nindent 6 }}
-      {{- if .Values.deployment.labels }}
-      {{- toYaml .Values.deployment.labels | nindent 6 }}
-      {{- end }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -31,61 +19,54 @@ spec:
       {{- end }}
       labels:
         {{- include "netobserv.labels" . | nindent 8 }}
-        {{- if .Values.deployment.labels }}
-        {{- toYaml .Values.deployment.labels | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- if (or .Values.serviceAccount.create .Values.serviceAccount.name) }}
-      serviceAccountName: {{ include "gitea.serviceAccountName" . }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
+      serviceAccountName: {{ include "netobserv.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
-      restartPolicy: Always
       containers:
-        - name: {{ include "netobserv.name" . }}
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          {{- if .Values.args }}
-          args:
-            {{- .Values.args | toYaml | nindent 12 }}
-          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            - name: udp
+            - name: http
               containerPort: {{ .Values.service.port }}
-              protocol: UDP
-          {{- if .Values.netobserv.livenessProbe.enabled }}
+              protocol: TCP
           livenessProbe:
-            {{- toYaml (omit .Values.netobserv.livenessProbe "enabled") | nindent 12 }}
-          {{- end }}
-          {{- if .Values.netobserv.readinessProbe.enabled }}
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
-            {{- toYaml (omit .Values.netobserv.readinessProbe "enabled") | nindent 12 }}
-          {{- end }}
-          {{- if .Values.netobserv.startupProbe.enabled }}
-          startupProbe:
-            {{- toYaml (omit .Values.netobserv.startupProbe "enabled") | nindent 12 }}
-          {{- end }}
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.affinity }}
-        affinity:
-          {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.topologySpreadConstraints }}
-        topologySpreadConstraints:
-          {{- toYaml . | nindent 8 }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.tolerations }}
-        tolerations:
-          {{- toYaml . | nindent 8 }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
