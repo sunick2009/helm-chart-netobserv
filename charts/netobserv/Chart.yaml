@@ -17,6 +17,7 @@ sources:
 maintainers:
   - name: ElastiFlow Engineering Team
     email: engineering@elastiflow.com
+    url: www.elastiflow.com
 
 dependencies:
   # https://github.com/elastic/cloud-on-k8s
