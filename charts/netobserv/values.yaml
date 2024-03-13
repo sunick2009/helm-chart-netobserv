@@ -95,6 +95,7 @@ service:
 
 image:
   repository: elastiflow/flow-collector
+  # Overrides the image tag whose default is the chart appVersion.
   tag: ""
   pullPolicy: IfNotPresent
 
