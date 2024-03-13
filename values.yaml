@@ -1,0 +1,143 @@
+# Default values for netobserv
+
+opensearch:
+  enabled: false
+
+elasticsearch:
+  enabled: true
+
+deployment:
+  env: []
+  terminationGracePeriodSeconds: 60
+  labels: {}
+  annotations: {}
+
+replicaCount: 1
+
+strategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxSurge: "100%"
+    maxUnavailable: 0
+
+serviceAccount:
+  create: false
+  name: ""
+  automountServiceAccountToken: false
+  imagePullSecrets: []
+  annotations: {}
+  labels: {}
+
+podAnnotations: {}
+args: {}
+
+env:
+  - name: EF_LICENSE_ACCEPTED
+    value: 'true'
+  # EF_FLOW_SERVER_UDP_IP: '0.0.0.0'
+  # EF_FLOW_SERVER_UDP_PORT: 9995
+  # EF_AWS_VPC_FLOW_LOG_ENABLE: 'false'
+  # EF_PROCESSOR_ENRICH_APP_ID_ENABLE: 'false'
+  # EF_PROCESSOR_ENRICH_APP_IPPORT_ENABLE: 'false'
+  # EF_PROCESSOR_ENRICH_IPADDR_METADATA_ENABLE: 'false'
+  # EF_PROCESSOR_ENRICH_IPADDR_DNS_ENABLE: 'false'
+  # EF_PROCESSOR_ENRICH_IPADDR_DNS_NAMESERVER_IP: ''
+  # EF_PROCESSOR_ENRICH_IPADDR_DNS_NAMESERVER_TIMEOUT: 3000
+  # EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_ASN_ENABLE: 'false'
+  # EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_ENABLE: 'false'
+  # EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_THREAT_ENABLE: 'false'
+  # EF_PROCESSOR_ENRICH_NETIF_METADATA_ENABLE: 'false'
+  # EF_PROCESSOR_ENRICH_NETIF_FLOW_OPTIONS_ENABLE: 'true'
+  # EF_PROCESSOR_ENRICH_NETIF_SNMP_ENABLE: 'false'
+  # EF_PROCESSOR_ENRICH_NETIF_SNMP_COMMUNITIES: 'public'
+  # EF_OUTPUT_ELASTICSEARCH_ENABLE: 'false'
+  # EF_OUTPUT_ELASTICSEARCH_ECS_ENABLE: 'false'
+  # EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_SHARDS: 1
+  # EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_REPLICAS: 0
+  # EF_OUTPUT_ELASTICSEARCH_ADDRESSES: '127.0.0.1:9200'
+  # EF_OUTPUT_ELASTICSEARCH_USERNAME: 'elastic'
+  # EF_OUTPUT_ELASTICSEARCH_PASSWORD: 'changeme'
+  # EF_OUTPUT_ELASTICSEARCH_TLS_ENABLE: 'false'
+  # EF_OUTPUT_ELASTICSEARCH_TLS_SKIP_VERIFICATION: 'false'
+  # EF_OUTPUT_ELASTICSEARCH_TLS_CA_CERT_FILEPATH: ''
+  # EF_OUTPUT_OPENSEARCH_ENABLE: 'false'
+  # EF_OUTPUT_OPENSEARCH_ECS_ENABLE: 'false'
+  # EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_SHARDS: 1
+  # EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_REPLICAS: 0
+  # EF_OUTPUT_OPENSEARCH_ADDRESSES: '127.0.0.1:9200'
+  # EF_OUTPUT_OPENSEARCH_USERNAME: 'admin'
+  # EF_OUTPUT_OPENSEARCH_PASSWORD: 'admin'
+  # EF_OUTPUT_OPENSEARCH_TLS_ENABLE: 'false'
+  # EF_OUTPUT_OPENSEARCH_TLS_SKIP_VERIFICATION: 'false'
+  # EF_OUTPUT_OPENSEARCH_TLS_CA_CERT_FILEPATH: ''
+  # EF_OUTPUT_SPLUNK_HEC_ENABLE: 'false'
+  # EF_OUTPUT_SPLUNK_HEC_ADDRESSES: '127.0.0.1:8088'
+  # EF_OUTPUT_SPLUNK_HEC_TOKEN: ''
+  # EF_OUTPUT_KAFKA_ENABLE: 'false'
+  # EF_OUTPUT_KAFKA_BROKERS: ''
+  # EF_OUTPUT_KAFKA_SASL_ENABLE: 'false'
+  # EF_OUTPUT_CRIBL_ENABLE: 'false'
+  # EF_OUTPUT_CRIBL_ADDRESSES: '127.0.0.1:10080'
+  # EF_OUTPUT_CRIBL_TOKEN: ''
+  # EF_OUTPUT_GENERIC_HTTP_ENABLE: 'false'
+  # EF_OUTPUT_GENERIC_HTTP_ECS_ENABLE: 'false'
+  # EF_OUTPUT_GENERIC_HTTP_ADDRESSES: ''
+  # EF_OUTPUT_RISKIQ_ENABLE: 'false'
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 9995
+  targetPort: 9995
+  nodePort:
+  annotations: {}
+  labels: {}
+
+image:
+  registry: ""
+  repository: elastiflow/flow-collector
+  tag: ""
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+netobserv:
+  livenessProbe:
+    enabled: false
+    httpGet:
+      path: /liveness
+      port: http
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    failureThreshold: 3
+    timeoutSeconds: 10
+    successThreshold: 1
+  startupProbe:
+    enabled: false
+    httpGet:
+      path: /startup
+      port: http
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    failureThreshold: 10
+    # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+    # Must be 1 for liveness and startup Probes.
+    timeoutSeconds: 3
+    successThreshold: 1
+  readinessProbe:
+    enabled: false
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+tolerations: []
+affinity: []
+topologySpreadConstraints: []
