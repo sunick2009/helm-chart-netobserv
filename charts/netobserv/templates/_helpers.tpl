@@ -2,7 +2,23 @@
 Expand the name of the chart.
 */}}
 {{- define "netobserv.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create a default fully qualified app name.
+*/}}
+{{- define "netobserv.fullname" -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -30,22 +46,4 @@ Selector labels
 {{- define "netobserv.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "netobserv.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end -}}
-
-{{/*
-Create image name and tag used by the deployment.
-*/}}
-{{- define "netobserv.image" -}}
-{{- $fullOverride := .Values.image.fullOverride | default "" -}}
-{{- $registry := .Values.image.registry | default .Values.image.registry -}}
-{{- $repository := .Values.image.repository -}}
-{{- $separator := ":" -}}
-{{- $tag := .Values.image.tag | default .Chart.AppVersion -}}
-{{- if $fullOverride }}
-    {{- printf "%s" $fullOverride -}}
-{{- else if $registry }}
-    {{- printf "%s/%s%s%s" $registry $repository $separator $tag -}}
-{{- else -}}
-    {{- printf "%s%s%s" $repository $separator $tag -}}
-{{- end -}}
 {{- end -}}

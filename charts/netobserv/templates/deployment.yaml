@@ -44,9 +44,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: {{ include "netobserv.name" . }}
-          # image: "elastiflow/flow-collector:{{ .Values.image.tag }}"
-          image: "{{ include "netobserv.image" . }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           {{- if .Values.args }}
           args:
             {{- .Values.args | toYaml | nindent 12 }}

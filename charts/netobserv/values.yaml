@@ -94,7 +94,6 @@ service:
   labels: {}
 
 image:
-  registry: ""
   repository: elastiflow/flow-collector
   tag: ""
   pullPolicy: IfNotPresent
