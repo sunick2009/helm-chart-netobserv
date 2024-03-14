@@ -24,6 +24,11 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v4
 
+      - name: Add dependency repositories
+        run: |
+          helm repo add eck-operator https://helm.elastic.co
+          helm repo add opensearch https://opensearch-project.github.io/helm-charts/
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         env:
