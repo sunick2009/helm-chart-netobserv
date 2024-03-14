@@ -2,7 +2,7 @@ apiVersion: v2
 name: netobserv
 description: ElastiFlow NetObserv
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: 6.4.2
 
 keywords:
@@ -27,5 +27,5 @@ dependencies:
   # https://opensearch.org/docs/latest/install-and-configure/install-opensearch/helm/
   - name: opensearch
     repository: https://opensearch-project.github.io/helm-charts/
-    version: "2.12.*"
+    version: "2.18.*"
     condition: opensearch.enabled
