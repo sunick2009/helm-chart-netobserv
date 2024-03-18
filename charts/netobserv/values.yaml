@@ -4,7 +4,7 @@ opensearch:
   enabled: false
 
 elasticsearch:
-  enabled: true
+  enabled: false
 
 replicaCount: 1
 
@@ -101,7 +101,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 80
+  port: 9995
 
 ingress:
   enabled: false
