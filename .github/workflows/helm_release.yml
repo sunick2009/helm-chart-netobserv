@@ -1,4 +1,7 @@
-name: Release Charts
+name: Release Helm Chart
+
+concurrency:
+  group: release-helm-chart-${{ github.ref }}
 
 on:
   push:
@@ -6,30 +9,48 @@ on:
       - main
 
 jobs:
-  release:
+  # TODO(madison#ENG-1839|2024-03-21):  swap to this method once we are ready for a public release flow.
+  # release:
+  #   permissions:
+  #     contents: write
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+
+  #     - name: Configure Git
+  #       run: |
+  #         git config user.name "$GITHUB_ACTOR"
+  #         git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+  #     - name: Install Helm
+  #       uses: azure/setup-helm@v4
+
+  #     - name: Add dependency repositories
+  #       run: |
+  #         helm repo add eck-operator https://helm.elastic.co
+  #         helm repo add opensearch https://opensearch-project.github.io/helm-charts/
+
+  #     - name: Run chart-releaser
+  #       uses: helm/chart-releaser-action@v1.6.0
+  #       env:
+  #         CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+  release_tag:
+    name: Release a tag
     permissions:
       contents: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    uses: elastiflow/gha-reusable-workflows/.github/workflows/reusable_release_tag.yml@v0
 
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
-      - name: Install Helm
-        uses: azure/setup-helm@v4
-
-      - name: Add dependency repositories
-        run: |
-          helm repo add eck-operator https://helm.elastic.co
-          helm repo add opensearch https://opensearch-project.github.io/helm-charts/
-
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.6.0
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+  release_helm_chart:
+    name: Release Helm Chart
+    permissions:
+      contents: "read"
+      id-token: "write"
+    uses: elastiflow/gha-reusable-workflows/.github/workflows/reusable_release_helm_chart.yml@v0
+    needs: release_tag
+    with:
+      version: ${{ needs.release_tag.outputs.version }}
+      chart_registry: oci://us-docker.pkg.dev/operations-trv1s8/helm-chart-netobserv
