@@ -53,4 +53,5 @@ jobs:
     needs: release_tag
     with:
       version: ${{ needs.release_tag.outputs.version }}
+      chart_dir: charts/netobserv
       chart_registry: oci://us-docker.pkg.dev/operations-trv1s8/helm-chart-netobserv
