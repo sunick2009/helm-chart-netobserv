@@ -67,6 +67,14 @@ env:
   # EF_OUTPUT_GENERIC_HTTP_ADDRESSES: ''
   # EF_OUTPUT_RISKIQ_ENABLE: 'false'
 
+license:
+  # Specifies whether a secret should be created. If you don't have a license, no need to create a license secret.
+  createSecret: false
+  # Secret name to be used for the license. If empty, the secret name defaults to `netobserv-license`
+  # If no secret with a matching name exists, the value will be set from `licenseKey`.instead.
+  secretRef: ""
+  # Set license key, if not set, value from secret will be used
+  licenseKey: ""
 
 imagePullSecrets: []
 nameOverride: ""
