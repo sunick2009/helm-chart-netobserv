@@ -40,7 +40,7 @@ spec:
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if .Values.license.createSecret -}}
+          {{- if .Values.license.createSecret }}
             - name: EF_FLOW_LICENSE_KEY
               valueFrom:
                 secretKeyRef:
