@@ -67,6 +67,13 @@ env:
   # EF_OUTPUT_GENERIC_HTTP_ADDRESSES: ''
   # EF_OUTPUT_RISKIQ_ENABLE: 'false'
 
+# If the EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_ASN_ENABLE and EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_ENABLE
+# enironment variables are set to true, enable maxmind and provide a MaxMind license key:
+# https://dev.maxmind.com/geoip/geolite2-free-geolocation-data
+maxmind:
+  enabled: false
+  licenseKey: ""
+
 license:
   # Specifies whether a secret should be created. If you don't have a license, no need to create a license secret.
   createSecret: false
