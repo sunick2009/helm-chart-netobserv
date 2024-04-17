@@ -84,25 +84,15 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if or .Values.volumeMounts .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
+          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
           volumeMounts:
-            {{- if .Values.volumeMounts }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-            {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
             - name: geolite2-data
               mountPath: /etc/elastiflow/maxmind
-            {{- end }}
           {{- end }}
-      {{- if or .Values.volumes .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
+      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
       volumes:
-        {{- if .Values.volumes }}
-        {{- toYaml .Values.volumes | nindent 4 }}
-        {{- end }}
-        {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
         - name: geolite2-data
           emptyDir: {}
-        {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
