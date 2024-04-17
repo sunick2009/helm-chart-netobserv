@@ -30,6 +30,29 @@ spec:
       serviceAccountName: {{ include "netobserv.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
+      initContainers:
+        {{- if .Values.maxmind.asnEnabled }}
+        - name: download-geolite2-asn
+          image: curlimages/curl
+          command: ["sh", "-c"]
+          args:
+            - "curl -o /data/GeoLite2-ASN.tar.gz https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-ASN&license_key={{ .Values.maxmind.licenseKey }}&suffix=tar.gz && tar -xzvf GeoLite2-ASN.tar.gz && rm GeoLite2-ASN.tar.gz"
+          volumeMounts:
+            - name: geolite2-data
+              mountPath: /data
+        {{- end }}
+        {{- if .Values.maxmind.geoipEnabled }}
+        - name: download-geolite2-city
+          image: curlimages/curl
+          command: ["sh", "-c"]
+          args:
+            - "curl -o /data/GeoLite2-City.tar.gz https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key={{ .Values.maxmind.licenseKey }}&suffix=tar.gz && tar -xzvf GeoLite2-City.tar.gz && rm GeoLite2-City.tar.gz"
+          volumeMounts:
+            - name: geolite2-data
+              mountPath: /data
+        {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -61,13 +84,15 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
+          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
+            - name: geolite2-data
+              mountPath: /etc/elastiflow/maxmind
           {{- end }}
-      {{- with .Values.volumes }}
+      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
       volumes:
-        {{- toYaml . | nindent 8 }}
+        - name: geolite2-data
+          emptyDir: {}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
