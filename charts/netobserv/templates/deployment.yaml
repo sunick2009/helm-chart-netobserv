@@ -33,7 +33,7 @@ spec:
       {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
       initContainers:
         {{- if .Values.maxmind.asnEnabled }}
-        - name: Download GeoLite2-ASN
+        - name: download-geolite2-asn
           image: curlimages/curl
           command: ["sh", "-c"]
           args:
@@ -43,7 +43,7 @@ spec:
               mountPath: /data
         {{- end }}
         {{- if .Values.maxmind.geoipEnabled }}
-        - name: Download GeoLite2-City
+        - name: download-geolite2-city
           image: curlimages/curl
           command: ["sh", "-c"]
           args:
