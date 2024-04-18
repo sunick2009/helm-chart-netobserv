@@ -68,7 +68,7 @@ env:
   # EF_OUTPUT_RISKIQ_ENABLE: 'false'
 
 # If the EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_ASN_ENABLE or EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_ENABLE
-# environment variables are set to true, enable the corresponding service and provide a MaxMind license key:
+# environment variables are set to true, enable the corresponding service and provide a MaxMind acount id and license key:
 # https://dev.maxmind.com/geoip/geolite2-free-geolocation-data
 maxmind:
   # Enabling asn will look up the autonomous system number and autonomous system
@@ -77,6 +77,7 @@ maxmind:
   # Enabling geoip will look up the country, subdivisions (regions), city, and
   # postal code associated with IPv4 and IPv6 addresses.
   geoipEnabled: false
+  accountId: ""
   licenseKey: ""
 
 license:
