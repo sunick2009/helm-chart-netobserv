@@ -32,26 +32,14 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
       initContainers:
-        {{- if .Values.maxmind.asnEnabled }}
-        - name: download-geolite2-asn
-          image: curlimages/curl
-          command: ["sh", "-c"]
-          args:
-            - "cd /data \
-              && curl -JL -u {{ .Values.maxmind.accountId }}:{{ .Values.maxmind.licenseKey }} https://download.maxmind.com/geoip/databases/GeoLite2-ASN/download?suffix=tar.gz -o GeoLite2-ASN.tar.gz \
-              && tar -xzvf GeoLite2-ASN.tar.gz \
-              && rm GeoLite2-ASN.tar.gz"
-          volumeMounts:
-            - name: geolite2-data
-              mountPath: /data
-        {{- end }}
+
         {{- if .Values.maxmind.geoipEnabled }}
         - name: download-geolite2-city
           image: curlimages/curl
           command: ["sh", "-c"]
+          workingDir: /data
           args:
-            - "cd /data \
-              && curl -JL -u {{ .Values.maxmind.accountId }}:{{ .Values.maxmind.licenseKey }} https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz -o GeoLite2-City.tar.gz \
+            - "curl -JL -u {{ .Values.maxmind.accountId }}:{{ .Values.maxmind.licenseKey }} https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz -o GeoLite2-City.tar.gz \
               && tar -xzvf GeoLite2-City.tar.gz \
               && rm GeoLite2-City.tar.gz"
           volumeMounts:
@@ -95,6 +83,31 @@ spec:
             - name: geolite2-data
               mountPath: /etc/elastiflow/maxmind
           {{- end }}
+        {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
+        - name: maxmind-geoipupdate
+          image: maxmindinc/geoipupdate
+          workingDir: /data
+          env:
+            - name: GEOIPUPDATE_ACCOUNT_ID
+              value: {{ .Values.maxmind.accountId | quote }}
+            - name: GEOIPUPDATE_LICENSE_KEY
+              value: {{ .Values.maxmind.licenseKey | quote }}
+            - name: GEOIPUPDATE_EDITION_IDS
+              {{- if and .Values.maxmind.asnEnabled (not .Values.maxmind.geoipEnabled) }}
+              value: "GeoLite2-ASN"
+              {{- end }}
+              {{- if and .Values.maxmind.geoipEnabled (not .Values.maxmind.asnEnabled) }}
+              value: "GeoLite2-City"
+              {{- end }}
+              {{- if and .Values.maxmind.geoipEnabled .Values.maxmind.asnEnabled }}
+              value: "GeoLite2-ASN GeoLite2-City"
+              {{- end }}
+            - name: GEOIPUPDATE_DB_DIR
+              value: /data
+          volumeMounts:
+            - name: geolite2-data
+              mountPath: /data
+        {{- end }}
       {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
       volumes:
         - name: geolite2-data
