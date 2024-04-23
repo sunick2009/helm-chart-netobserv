@@ -55,7 +55,6 @@ spec:
           volumeMounts:
             - name: geolite2-data
               mountPath: /data
-        {{- end }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
