@@ -30,6 +30,33 @@ spec:
       serviceAccountName: {{ include "netobserv.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
+      initContainers:
+        - name: maxmind-geoipupdate
+          image: maxmindinc/geoipupdate
+          workingDir: /data
+          env:
+            - name: GEOIPUPDATE_ACCOUNT_ID
+              value: {{ .Values.maxmind.accountId | quote }}
+            - name: GEOIPUPDATE_LICENSE_KEY
+              value: {{ .Values.maxmind.licenseKey | quote }}
+            - name: GEOIPUPDATE_EDITION_IDS
+              {{- if and .Values.maxmind.asnEnabled (not .Values.maxmind.geoipEnabled) }}
+              value: "GeoLite2-ASN"
+              {{- end }}
+              {{- if and .Values.maxmind.geoipEnabled (not .Values.maxmind.asnEnabled) }}
+              value: "GeoLite2-City"
+              {{- end }}
+              {{- if and .Values.maxmind.geoipEnabled .Values.maxmind.asnEnabled }}
+              value: "GeoLite2-ASN GeoLite2-City"
+              {{- end }}
+            - name: GEOIPUPDATE_DB_DIR
+              value: /data
+          volumeMounts:
+            - name: geolite2-data
+              mountPath: /data
+        {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
