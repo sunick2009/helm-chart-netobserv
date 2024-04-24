@@ -44,9 +44,6 @@ spec:
                 secretKeyRef:
                   name: maxmind-license
                   key: license
-            {{- else }}
-            - name: GEOIPUPDATE_LICENSE_KEY
-              value: {{ .Values.maxmind.licenseKey | quote }}
             {{- end }}
             - name: GEOIPUPDATE_EDITION_IDS
               {{- if and .Values.maxmind.asnEnabled (not .Values.maxmind.geoipEnabled) }}
@@ -107,8 +104,13 @@ spec:
           env:
             - name: GEOIPUPDATE_ACCOUNT_ID
               value: {{ .Values.maxmind.accountId | quote }}
+            {{- if .Values.maxmind.createSecret }}
             - name: GEOIPUPDATE_LICENSE_KEY
-              value: {{ .Values.maxmind.licenseKey | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: maxmind-license
+                  key: license
+            {{- end }}
             - name: GEOIPUPDATE_EDITION_IDS
               {{- if and .Values.maxmind.asnEnabled (not .Values.maxmind.geoipEnabled) }}
               value: "GeoLite2-ASN"
