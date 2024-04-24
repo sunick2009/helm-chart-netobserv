@@ -105,7 +105,7 @@ spec:
             - name: GEOIPUPDATE_LICENSE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.maxmind.secretRef}}
+                  name: {{ .Values.maxmind.secretRef }}
                   key: license
             - name: GEOIPUPDATE_EDITION_IDS
               {{- if and .Values.maxmind.asnEnabled (not .Values.maxmind.geoipEnabled) }}
