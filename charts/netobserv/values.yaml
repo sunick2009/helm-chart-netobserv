@@ -67,25 +67,31 @@ env:
   # EF_OUTPUT_GENERIC_HTTP_ADDRESSES: ''
   # EF_OUTPUT_RISKIQ_ENABLE: 'false'
 
+license:
+  # Specifies whether a secret should be created. If you don't have a license, no need to create a license secret.
+  createSecret: false
+  # Secret name to be used for the license. If empty, the secret name defaults to `netobserv-license`
+  # If no secret with a matching name exists, the value will be set from `licenseKey`.instead.
+  secretRef: "netobserv-license"
+  # Set license key, if not set, value from secret will be used
+  licenseKey: ""
+
 # If the EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_ASN_ENABLE or EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_ENABLE
-# environment variables are set to true, enable the corresponding service and provide a MaxMind license key:
+# environment variables are set to true, enable the corresponding service and provide a MaxMind acount id and license key:
 # https://dev.maxmind.com/geoip/geolite2-free-geolocation-data
 maxmind:
+  # Specifies whether a secret should be created for the maxmind license key.
+  createSecret: false
+  # Secret name to be used for the license. If empty, the secret name defaults to `maxmind-license`
+  # If no secret with a matching name exists, the value will be set from `licenseKey`.instead.
+  secretRef: "maxmind-license"
   # Enabling asn will look up the autonomous system number and autonomous system
   # organization associated with IPv4 and IPv6 addresses.
   asnEnabled: false
   # Enabling geoip will look up the country, subdivisions (regions), city, and
   # postal code associated with IPv4 and IPv6 addresses.
   geoipEnabled: false
-  licenseKey: ""
-
-license:
-  # Specifies whether a secret should be created. If you don't have a license, no need to create a license secret.
-  createSecret: false
-  # Secret name to be used for the license. If empty, the secret name defaults to `netobserv-license`
-  # If no secret with a matching name exists, the value will be set from `licenseKey`.instead.
-  secretRef: ""
-  # Set license key, if not set, value from secret will be used
+  accountId: ""
   licenseKey: ""
 
 imagePullSecrets: []
