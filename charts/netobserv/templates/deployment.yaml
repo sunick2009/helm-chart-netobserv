@@ -81,10 +81,12 @@ spec:
             value: 'true'
           - name: "EF_OUTPUT_KAFKA_BROKERS"
             value: {{ .Values.kafka.brokers }}
-          {{- end }}
           {{- if .Values.kafka.tls.enabled }}
+            - name: EF_OUTPUT_KAFKA_TLS_ENABLE
+              value: 'true'
             - name: "EF_OUTPUT_KAFKA_TLS_CA_CERT_FILEPATH"
               value: "{{ .Values.kafka.tls.caMountPath }}/{{ .Values.kafka.tls.caFilename }}"
+          {{- end }}
           {{- end }}
           ports:
             - name: udp
