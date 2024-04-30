@@ -76,6 +76,18 @@ spec:
                   name: netobserv-license
                   key: license
           {{- end }}
+          {{- if .Values.kafka.enabled }}
+          - name: EF_OUTPUT_KAFKA_ENABLE
+            value: 'true'
+          - name: "EF_OUTPUT_KAFKA_BROKERS"
+            value: {{ .Values.kafka.brokers }}
+          {{- if .Values.kafka.tls.enabled }}
+            - name: EF_OUTPUT_KAFKA_TLS_ENABLE
+              value: 'true'
+            - name: "EF_OUTPUT_KAFKA_TLS_CA_CERT_FILEPATH"
+              value: "{{ .Values.kafka.tls.caMountPath }}/{{ .Values.kafka.tls.caFilename }}"
+          {{- end }}
+          {{- end }}
           ports:
             - name: udp
               containerPort: {{ .Values.service.port }}
@@ -90,10 +102,17 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
+          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.kafka.tls.enabled }}
           volumeMounts:
+            {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
             - name: geolite2-data
               mountPath: /etc/elastiflow/maxmind
+            {{- end }}
+            {{- if .Values.kafka.tls.enabled }}
+            - name: {{ .Values.kafka.tls.caConfigMap }}
+              mountPath: {{ .Values.kafka.tls.caMountPath }}
+              readOnly: True
+            {{- end }}
           {{- end }}
         {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
         - name: maxmind-geoipupdate
@@ -123,10 +142,20 @@ spec:
             - name: geolite2-data
               mountPath: /data
         {{- end }}
-      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
+      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.kafka.tls.enabled }}
       volumes:
+        {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
         - name: geolite2-data
           emptyDir: {}
+        {{- end }}
+        {{- if .Values.kafka.tls.enabled }}
+        - name: {{ .Values.kafka.tls.caFileName }}
+          configMap:
+            name: {{ .Values.kafka.tls.caConfigMap }}
+            items:
+              - key: {{ .Values.kafka.tls.caConfigMapKey }}
+                path: {{ .Values.kafka.tls.caFileName }}
+        {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

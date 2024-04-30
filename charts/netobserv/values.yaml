@@ -56,8 +56,6 @@ env:
   # EF_OUTPUT_SPLUNK_HEC_ENABLE: 'false'
   # EF_OUTPUT_SPLUNK_HEC_ADDRESSES: '127.0.0.1:8088'
   # EF_OUTPUT_SPLUNK_HEC_TOKEN: ''
-  # EF_OUTPUT_KAFKA_ENABLE: 'false'
-  # EF_OUTPUT_KAFKA_BROKERS: ''
   # EF_OUTPUT_KAFKA_SASL_ENABLE: 'false'
   # EF_OUTPUT_CRIBL_ENABLE: 'false'
   # EF_OUTPUT_CRIBL_ADDRESSES: '127.0.0.1:10080'
@@ -66,6 +64,27 @@ env:
   # EF_OUTPUT_GENERIC_HTTP_ECS_ENABLE: 'false'
   # EF_OUTPUT_GENERIC_HTTP_ADDRESSES: ''
   # EF_OUTPUT_RISKIQ_ENABLE: 'false'
+
+# The Kafka output can be used to send records to Apache Kafka, Confluent Platform,
+# Confluent Cloud, Redpanda and Amazon Managed Streaming for Apache Kafka (Amazon MSK).
+# https://docs.elastiflow.com/docs/output-kafka
+kafka:
+  # Enable/disable TLS connections to Kafka.
+  enabled: false
+  # A comma-separated list of brokers, IP address and port number, to which the collector is to connect.
+  # Example: "192.0.2.11:9092,192.0.2.12:9092,192.0.2.13:9092"
+  brokers: ""
+  tls:
+    # Enable/disable TLS connections to Kafka.
+    enabled: false
+    # The name of the config map that contains the CA certificate.
+    caConfigMap: ""
+    # The path to the CA certificate file.
+    caMountPath: ""
+    # The key in the config map that contains the CA certificate.
+    caConfigMapKey: "ca.crt"
+    # The name of the file that contains the CA certificate.
+    caFileName: "ca.crt"
 
 license:
   # Specifies whether a secret should be created. If you don't have a license, no need to create a license secret.
