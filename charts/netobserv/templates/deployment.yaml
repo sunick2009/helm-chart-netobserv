@@ -32,7 +32,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
       initContainers:
-        - name: maxmind-geoipupdate
+        - name: init-maxmind-geoipupdate
           image: maxmindinc/geoipupdate
           workingDir: /data
           env:
@@ -77,15 +77,15 @@ spec:
                   key: license
           {{- end }}
           {{- if .Values.kafka.enabled }}
-          - name: EF_OUTPUT_KAFKA_ENABLE
-            value: 'true'
-          - name: "EF_OUTPUT_KAFKA_BROKERS"
-            value: {{ .Values.kafka.brokers }}
+            - name: EF_OUTPUT_KAFKA_ENABLE
+              value: 'true'
+            - name: "EF_OUTPUT_KAFKA_BROKERS"
+              value: {{ .Values.kafka.brokers }}
           {{- if .Values.kafka.tls.enabled }}
             - name: EF_OUTPUT_KAFKA_TLS_ENABLE
               value: 'true'
             - name: "EF_OUTPUT_KAFKA_TLS_CA_CERT_FILEPATH"
-              value: "{{ .Values.kafka.tls.caMountPath }}/{{ .Values.kafka.tls.caFilename }}"
+              value: "{{ .Values.kafka.tls.caMountPath }}/{{ .Values.kafka.tls.caFileName }}"
           {{- end }}
           {{- end }}
           ports:
@@ -149,7 +149,7 @@ spec:
           emptyDir: {}
         {{- end }}
         {{- if .Values.kafka.tls.enabled }}
-        - name: {{ .Values.kafka.tls.caFileName }}
+        - name: {{ .Values.kafka.tls.caConfigMap }}
           configMap:
             name: {{ .Values.kafka.tls.caConfigMap }}
             items:
