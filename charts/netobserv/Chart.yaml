@@ -2,7 +2,7 @@ apiVersion: v2
 name: netobserv
 description: ElastiFlow NetObserv
 type: application
-version: 0.0.15
+version: 0.0.16
 appVersion: 6.4.3
 
 keywords:
@@ -22,10 +22,10 @@ dependencies:
   # https://github.com/elastic/cloud-on-k8s
   - name: eck-operator
     repository: https://helm.elastic.co
-    version: "2.11.*"
+    version: "2.12.*"
     condition: elasticsearch.enabled
   # https://opensearch.org/docs/latest/install-and-configure/install-opensearch/helm/
   - name: opensearch
     repository: https://opensearch-project.github.io/helm-charts/
-    version: "2.18.*"
+    version: "2.19.*"
     condition: opensearch.enabled
