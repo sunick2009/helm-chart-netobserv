@@ -69,6 +69,25 @@ spec:
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.outputElasticsearch.enabled }}
+            - name: EF_OUTPUT_ELASTICSEARCH_ENABLE
+              value: 'true'
+            - name: EF_OUTPUT_ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.outputElasticsearch.secretRef }}
+                  key: {{ .Values.outputElasticsearch.secretKey }}
+          {{- if .Values.outputElasticsearch.ecs.enabled }}
+            - name: EF_OUTPUT_ELASTICSEARCH_ECS_ENABLE
+                value: 'true'
+          {{- end }}
+          {{- if .Values.outputElasticsearch.tls.enabled }}
+            - name: EF_OUTPUT_ELASTICSEARCH_TLS_ENABLE
+              value: 'true'
+            - name: "EF_OUTPUT_ELASTICSEARCH_TLS_CA_CERT_FILEPATH"
+              value: "{{ .Values.outputElasticsearch.tls.caMountPath }}/{{ .Values.outputElasticsearch.tls.caFileName }}"
+          {{- end }}
+          {{- end }}
           {{- if .Values.license.createSecret }}
             - name: EF_FLOW_LICENSE_KEY
               valueFrom:
@@ -76,16 +95,16 @@ spec:
                   name: netobserv-license
                   key: license
           {{- end }}
-          {{- if .Values.kafka.enabled }}
+          {{- if .Values.outputKafka.enabled }}
             - name: EF_OUTPUT_KAFKA_ENABLE
               value: 'true'
             - name: "EF_OUTPUT_KAFKA_BROKERS"
-              value: {{ .Values.kafka.brokers }}
-          {{- if .Values.kafka.tls.enabled }}
+              value: {{ .Values.outputKafka.brokers }}
+          {{- if .Values.outputKafka.tls.enabled }}
             - name: EF_OUTPUT_KAFKA_TLS_ENABLE
               value: 'true'
             - name: "EF_OUTPUT_KAFKA_TLS_CA_CERT_FILEPATH"
-              value: "{{ .Values.kafka.tls.caMountPath }}/{{ .Values.kafka.tls.caFileName }}"
+              value: "{{ .Values.outputKafka.tls.caMountPath }}/{{ .Values.outputKafka.tls.caFileName }}"
           {{- end }}
           {{- end }}
           ports:
@@ -102,15 +121,20 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.kafka.tls.enabled }}
+          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled }}
           volumeMounts:
             {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
             - name: geolite2-data
               mountPath: /etc/elastiflow/maxmind
             {{- end }}
-            {{- if .Values.kafka.tls.enabled }}
-            - name: {{ .Values.kafka.tls.caConfigMap }}
-              mountPath: {{ .Values.kafka.tls.caMountPath }}
+            {{- if .Values.outputKafka.tls.enabled }}
+            - name: {{ .Values.outputKafka.tls.caConfigMap }}
+              mountPath: {{ .Values.outputKafka.tls.caMountPath }}
+              readOnly: True
+            {{- end }}
+            {{- if .Values.outputElasticsearch.tls.enabled }}
+            - name: {{ .Values.outputElasticsearch.tls.caConfigMap }}
+              mountPath: {{ .Values.outputElasticsearch.tls.caMountPath }}
               readOnly: True
             {{- end }}
           {{- end }}
@@ -142,19 +166,27 @@ spec:
             - name: geolite2-data
               mountPath: /data
         {{- end }}
-      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.kafka.tls.enabled }}
+      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled }}
       volumes:
         {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
         - name: geolite2-data
           emptyDir: {}
         {{- end }}
-        {{- if .Values.kafka.tls.enabled }}
-        - name: {{ .Values.kafka.tls.caConfigMap }}
+        {{- if .Values.outputKafka.tls.enabled }}
+        - name: {{ .Values.outputKafka.tls.caConfigMap }}
           configMap:
-            name: {{ .Values.kafka.tls.caConfigMap }}
+            name: {{ .Values.outputKafka.tls.caConfigMap }}
             items:
-              - key: {{ .Values.kafka.tls.caConfigMapKey }}
-                path: {{ .Values.kafka.tls.caFileName }}
+              - key: {{ .Values.outputKafka.tls.caConfigMapKey }}
+                path: {{ .Values.outputKafka.tls.caFileName }}
+        {{- end }}
+        {{- if .Values.outputElasticsearch.tls.enabled }}
+        - name: {{ .Values.outputElasticsearch.tls.caConfigMap }}
+          configMap:
+            name: {{ .Values.outputElasticsearch.tls.caConfigMap }}
+            items:
+              - key: {{ .Values.outputElasticsearch.tls.caConfigMapKey }}
+                path: {{ .Values.outputElasticsearch.tls.caFileName }}
         {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}

@@ -1,9 +1,9 @@
 dependencies:
 - name: eck-operator
   repository: https://helm.elastic.co
-  version: 2.11.1
+  version: 2.12.1
 - name: opensearch
   repository: https://opensearch-project.github.io/helm-charts/
-  version: 2.18.0
-digest: sha256:6bde020f5d3c85c45c46ad78363f179ade9986ec56d1c2df51367d96e2899a8f
-generated: "2024-03-14T13:57:10.817556565Z"
+  version: 2.19.0
+digest: sha256:3e4b547176e4ca648c033113d2d798bc519ee1021638437a41f4939a59ceff80
+generated: "2024-05-07T16:23:41.28577-04:00"
