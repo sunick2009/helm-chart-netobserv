@@ -11,6 +11,8 @@ spec:
   selector:
     matchLabels:
       {{- include "netobserv.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: {{ .Values.strategyType }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -88,12 +90,36 @@ spec:
               value: "{{ .Values.outputElasticsearch.tls.caMountPath }}/{{ .Values.outputElasticsearch.tls.caFileName }}"
           {{- end }}
           {{- end }}
+          {{- if .Values.outputOpenSearch.enabled }}
+            - name: EF_OUTPUT_OPENSEARCH_ENABLE
+              value: 'true'
+            - name: EF_OUTPUT_OPENSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.outputOpenSearch.secretRef }}
+                  key: {{ .Values.outputOpenSearch.secretKey }}
+          {{- if .Values.outputOpenSearch.ecs.enabled }}
+            - name: EF_OUTPUT_OPENSEARCH_ECS_ENABLE
+                value: 'true'
+          {{- end }}
+          {{- if .Values.outputOpenSearch.tls.enabled }}
+            - name: EF_OUTPUT_OPENSEARCH_TLS_ENABLE
+              value: 'true'
+            - name: "EF_OUTPUT_OPENSEARCH_TLS_CA_CERT_FILEPATH"
+              value: "{{ .Values.outputOpenSearch.tls.caMountPath }}/{{ .Values.outputOpenSearch.tls.caFileName }}"
+          {{- end }}
+          {{- end }}
           {{- if .Values.license.createSecret }}
             - name: EF_FLOW_LICENSE_KEY
               valueFrom:
                 secretKeyRef:
                   name: netobserv-license
                   key: license
+            - name: EF_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: netobserv-license
+                  key: accountId
           {{- end }}
           {{- if .Values.outputKafka.enabled }}
             - name: EF_OUTPUT_KAFKA_ENABLE
@@ -121,7 +147,7 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled }}
+          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled .Values.outputOpenSearch.tls.enabled }}
           volumeMounts:
             {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
             - name: geolite2-data
@@ -135,6 +161,11 @@ spec:
             {{- if .Values.outputElasticsearch.tls.enabled }}
             - name: {{ .Values.outputElasticsearch.tls.caConfigMap }}
               mountPath: {{ .Values.outputElasticsearch.tls.caMountPath }}
+              readOnly: True
+            {{- end }}
+            {{- if .Values.outputOpenSearch.tls.enabled }}
+            - name: {{ .Values.outputOpenSearch.tls.caConfigMap }}
+              mountPath: {{ .Values.outputOpenSearch.tls.caMountPath }}
               readOnly: True
             {{- end }}
           {{- end }}
@@ -166,7 +197,7 @@ spec:
             - name: geolite2-data
               mountPath: /data
         {{- end }}
-      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled }}
+      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled .Values.outputOpenSearch.tls.enabled }}
       volumes:
         {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
         - name: geolite2-data
@@ -187,6 +218,14 @@ spec:
             items:
               - key: {{ .Values.outputElasticsearch.tls.caConfigMapKey }}
                 path: {{ .Values.outputElasticsearch.tls.caFileName }}
+        {{- end }}
+        {{- if .Values.outputOpenSearch.tls.enabled }}
+        - name: {{ .Values.outputOpenSearch.tls.caConfigMap }}
+          configMap:
+            name: {{ .Values.outputOpenSearch.tls.caConfigMap }}
+            items:
+              - key: {{ .Values.outputOpenSearch.tls.caConfigMapKey }}
+                path: {{ .Values.outputOpenSearch.tls.caFileName }}
         {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}

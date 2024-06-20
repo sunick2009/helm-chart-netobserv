@@ -8,6 +8,10 @@ elasticsearch:
 
 replicaCount: 1
 
+# The update strategy to apply to the Deployment.
+# Available options are: RollingUpdate and Recreate.
+strategyType: RollingUpdate
+
 image:
   repository: elastiflow/flow-collector
   pullPolicy: IfNotPresent
@@ -17,51 +21,11 @@ image:
 env:
   - name: EF_LICENSE_ACCEPTED
     value: 'true'
-  # EF_FLOW_SERVER_UDP_IP: '0.0.0.0'
-  # EF_FLOW_SERVER_UDP_PORT: 9995
-  # EF_AWS_VPC_FLOW_LOG_ENABLE: 'false'
-  # EF_PROCESSOR_ENRICH_APP_ID_ENABLE: 'false'
-  # EF_PROCESSOR_ENRICH_APP_IPPORT_ENABLE: 'false'
-  # EF_PROCESSOR_ENRICH_IPADDR_METADATA_ENABLE: 'false'
-  # EF_PROCESSOR_ENRICH_IPADDR_DNS_ENABLE: 'false'
-  # EF_PROCESSOR_ENRICH_IPADDR_DNS_NAMESERVER_IP: ''
-  # EF_PROCESSOR_ENRICH_IPADDR_DNS_NAMESERVER_TIMEOUT: 3000
-  # EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_ASN_ENABLE: 'false'
-  # EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_ENABLE: 'false'
-  # EF_PROCESSOR_ENRICH_IPADDR_RISKIQ_THREAT_ENABLE: 'false'
-  # EF_PROCESSOR_ENRICH_NETIF_METADATA_ENABLE: 'false'
-  # EF_PROCESSOR_ENRICH_NETIF_FLOW_OPTIONS_ENABLE: 'true'
-  # EF_PROCESSOR_ENRICH_NETIF_SNMP_ENABLE: 'false'
-  # EF_PROCESSOR_ENRICH_NETIF_SNMP_COMMUNITIES: 'public'
-  # EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_SHARDS: 1
-  # EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_REPLICAS: 0
-  # EF_OUTPUT_ELASTICSEARCH_ADDRESSES: '127.0.0.1:9200'
-  # EF_OUTPUT_ELASTICSEARCH_USERNAME: 'elastic'
-  # EF_OUTPUT_ELASTICSEARCH_TLS_SKIP_VERIFICATION: 'false'
-  # EF_OUTPUT_OPENSEARCH_ENABLE: 'false'
-  # EF_OUTPUT_OPENSEARCH_ECS_ENABLE: 'false'
-  # EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_SHARDS: 1
-  # EF_OUTPUT_OPENSEARCH_INDEX_TEMPLATE_REPLICAS: 0
-  # EF_OUTPUT_OPENSEARCH_ADDRESSES: '127.0.0.1:9200'
-  # EF_OUTPUT_OPENSEARCH_USERNAME: 'admin'
-  # EF_OUTPUT_OPENSEARCH_PASSWORD: 'admin'
-  # EF_OUTPUT_OPENSEARCH_TLS_ENABLE: 'false'
-  # EF_OUTPUT_OPENSEARCH_TLS_SKIP_VERIFICATION: 'false'
-  # EF_OUTPUT_OPENSEARCH_TLS_CA_CERT_FILEPATH: ''
-  # EF_OUTPUT_SPLUNK_HEC_ENABLE: 'false'
-  # EF_OUTPUT_SPLUNK_HEC_ADDRESSES: '127.0.0.1:8088'
-  # EF_OUTPUT_SPLUNK_HEC_TOKEN: ''
-  # EF_OUTPUT_KAFKA_SASL_ENABLE: 'false'
-  # EF_OUTPUT_CRIBL_ENABLE: 'false'
-  # EF_OUTPUT_CRIBL_ADDRESSES: '127.0.0.1:10080'
-  # EF_OUTPUT_CRIBL_TOKEN: ''
-  # EF_OUTPUT_GENERIC_HTTP_ENABLE: 'false'
-  # EF_OUTPUT_GENERIC_HTTP_ECS_ENABLE: 'false'
-  # EF_OUTPUT_GENERIC_HTTP_ADDRESSES: ''
-  # EF_OUTPUT_RISKIQ_ENABLE: 'false'
+  # Additional information for available environment variables can be found via
+  # the ElastiFlow documentation: https://docs.elastiflow.com/docs/config_ref
 
 # The Elasticsearch output can be used to send records to an Elasticsearch cluster.
-# https://docs.elastiflow.com/docs/output-elasticsearch
+# https://docs.elastiflow.com/docs/config_ref/common/output_elasticsearch
 outputElasticsearch:
   # Enable/disable the use of the Elasticsearch output.
   enabled: false
@@ -84,6 +48,29 @@ outputElasticsearch:
     # Enable/disable the use of the Elastic Common Schema (ECS).
     enabled: false
 
+# The OpenSearch output can be used to send records to an OpenSearch cluster.
+# https://docs.elastiflow.com/docs/config_ref/common/output_opensearch
+outputOpenSearch:
+  # Enable/disable the use of the OpenSearch output.
+  enabled: false
+  # Secret name to be used for the OpenSearch password. If empty, the secret name defaults to `opensearch-es-elastic-user`
+  secretRef: "opensearch-user"
+  # The key in the kubernetes scret that contains the OpenSearch password.
+  secretKey: opensearch-password
+  tls:
+    # Enable/disable TLS connections to OpenSearch.
+    enabled: false
+    # The name of the config map that contains the CA certificate.
+    caConfigMap: ""
+    # The path to the CA certificate file.
+    caMountPath: ""
+    # The key in the config map that contains the CA certificate.
+    caConfigMapKey: "ca.crt"
+    # The name of the file that contains the CA certificate.
+    caFileName: "ca.crt"
+  ecs:
+    # Enable/disable the use of the Elastic Common Schema (ECS).
+    enabled: false
 
 # The Kafka output can be used to send records to Apache Kafka, Confluent Platform,
 # Confluent Cloud, Redpanda and Amazon Managed Streaming for Apache Kafka (Amazon MSK).
@@ -112,6 +99,8 @@ license:
   # Secret name to be used for the license. If empty, the secret name defaults to `netobserv-license`
   # If no secret with a matching name exists, the value will be set from `licenseKey`.instead.
   secretRef: "netobserv-license"
+  # Set account id, if not set, value from secret will be used
+  accountId: ""
   # Set license key, if not set, value from secret will be used
   licenseKey: ""
 
@@ -165,8 +154,22 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
+  annotations: {}
   type: ClusterIP
-  port: 9995
+  externalTrafficPolicy: Local
+  ports:
+    - name: netflow
+      port: 9995
+      targetPort: 9995
+      protocol: UDP
+    # - name: ipfix
+    #   port: 4739
+    #   targetPort: 4739
+    #   protocol: UDP
+    # - name: sflow
+    #   port: 6343
+    #   targetPort: 6343
+    #   protocol: UDP
 
 ingress:
   enabled: false
@@ -211,6 +214,8 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
+
+selectorLabels: {}
 
 tolerations: []
 
