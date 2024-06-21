@@ -70,6 +70,10 @@ spec:
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{ if .Values.license.accountId }}
+          - name: EF_ACCOUNT_ID
+              value: {{ .Values.license.accountId }}
+          {{- end }}
           {{- if .Values.outputElasticsearch.enabled }}
             - name: EF_OUTPUT_ELASTICSEARCH_ENABLE
               value: 'true'
@@ -114,11 +118,6 @@ spec:
                 secretKeyRef:
                   name: netobserv-license
                   key: license
-            - name: EF_ACCOUNT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.license.secretRef }}
-                  key: accountId
           {{- end }}
           {{- if .Values.outputKafka.enabled }}
             - name: EF_OUTPUT_KAFKA_ENABLE
