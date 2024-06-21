@@ -134,9 +134,9 @@ spec:
           {{- end }}
           {{- end }}
           ports:
-            - name: udp
-              containerPort: {{ .Values.service.port }}
-              protocol: UDP
+          {{ with .Values.service.ports }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
