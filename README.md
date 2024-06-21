@@ -45,4 +45,3 @@ helm install netobserv elastiflow/netobserv --set license.licenseKey="licensekey
 ```
 
 For additional configuration secrets, please refer to the [configuration reference guide](https://docs.elastiflow.com/docs/config_ref/).
-

@@ -8,7 +8,9 @@ annotations:
   {{ .Values.service.annotations | toYaml | nindent 2 }}
 spec:
   type: {{ .Values.service.type }}
+  {{- if .Values.service.type | eq "LoadBalancer" }}
   externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
+  {{- end }}
   ports:
     {{ with .Values.service.ports }}
     {{- toYaml . | nindent 4 }}
