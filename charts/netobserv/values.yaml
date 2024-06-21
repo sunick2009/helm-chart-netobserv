@@ -162,18 +162,15 @@ service:
   # Local: Preserves the client source IP, avoids a second hop for LoadBalancer and NodePort Services, but may lead to imbalanced traffic spreading.
   # externalTrafficPolicy: Cluster
   ports:
-    - name: netflow
-      containerPort: 9995
-      targetPort: 9995
+    - containerPort: 9995
       protocol: UDP
-    # - name: ipfix
-    #   containerPort: 4739
-    #   targetPort: 4739
+      name: netflow
+    # - containerPort: 4739
     #   protocol: UDP
-    # - name: sflow
-    #   containerPort: 6343
-    #   targetPort: 6343
+    #   name: ipfix
+    # - containerPort: 6343
     #   protocol: UDP
+    #   name: sflow
 
 ingress:
   enabled: false
