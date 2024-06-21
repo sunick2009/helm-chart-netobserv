@@ -112,7 +112,7 @@ spec:
             - name: EF_FLOW_LICENSE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: netobserv-license
+                  name: {{ .Values.license.secretRef }}
                   key: license
             - name: EF_ACCOUNT_ID
               valueFrom:
