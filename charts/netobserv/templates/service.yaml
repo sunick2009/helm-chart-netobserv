@@ -11,9 +11,6 @@ spec:
   {{- if .Values.service.type | eq "LoadBalancer" }}
   externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
   {{- end }}
-  ports:
-    {{ with .Values.service.ports }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+  ports: {{ .Values.service.ports | toYaml | nindent 4 }}
   selector:
     {{- include "netobserv.selectorLabels" . | nindent 4 }}

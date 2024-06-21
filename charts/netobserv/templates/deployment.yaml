@@ -133,10 +133,7 @@ spec:
               value: "{{ .Values.outputKafka.tls.caMountPath }}/{{ .Values.outputKafka.tls.caFileName }}"
           {{- end }}
           {{- end }}
-          ports:
-          {{ with .Values.service.ports }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+          ports: {{ .Values.service.ports | toYaml | nindent 12 }}
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
