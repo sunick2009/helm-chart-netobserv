@@ -10,7 +10,10 @@ replicaCount: 1
 
 # The update strategy to apply to the Deployment.
 # Available options are: RollingUpdate and Recreate.
-strategyType: RollingUpdate
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
 
 image:
   repository: elastiflow/flow-collector
@@ -154,27 +157,35 @@ securityContext: {}
   # runAsUser: 1000
 
 # The netobserv container's ports to expose.
-container:
-  ports:
-    - name: netflow
-      containerPort: 9995
-      protocol: UDP
-    # - name: ipfix
-    #   containerPort: 4739
-    #   protocol: UDP
-    # - name: sflow
-    #   containerPort: 6343
-    #   protocol: UDP
+ports:
+  - name: netflow
+    containerPort: 9995
+    protocol: UDP
+  # - name: ipfix
+  #   containerPort: 4739
+  #   protocol: UDP
+  # - name: sflow
+  #   containerPort: 6343
+  #   protocol: UDP
 
 
 service:
   annotations: {}
   # The type of service to create. Available options are ClusterIP (default), NodePort, and LoadBalancer.
   type: ClusterIP
+
   # When the service type is LoadBalancer, the externalTrafficPolicy field routes external traffic to either node-local or cluster-wide endpoints. The two options are:
   # Cluster (default): Obscures the client source IP, may cause a second hop to another node, but ensures good load-spreading.
   # Local: Preserves the client source IP, avoids a second hop for LoadBalancer and NodePort Services, but may lead to imbalanced traffic spreading.
   # externalTrafficPolicy: Cluster
+
+  # When the service type is LoadBalancer, the loadBalancerIP field assigns a static IP address to the service.
+  # loadBalancerIP: "35.243.208.106"
+
+  # When the service type is LoadBalancer, the loadBalancerSourceRanges field restricts access to the service from a limited set of IP ranges.
+  # loadBalancerSourceRanges:
+  #   - "0.0.0.0/0"
+
   ports:
     - port: 9995
       targetPort: 9995
@@ -230,8 +241,6 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
-
-nodeSelector: {}
 
 tolerations: []
 

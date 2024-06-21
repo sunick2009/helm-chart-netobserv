@@ -11,8 +11,7 @@ spec:
   selector:
     matchLabels:
       {{- include "netobserv.selectorLabels" . | nindent 6 }}
-  strategy:
-    type: {{ .Values.strategyType }}
+  strategy: {{ with .Values.strategy }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -133,7 +132,7 @@ spec:
               value: "{{ .Values.outputKafka.tls.caMountPath }}/{{ .Values.outputKafka.tls.caFileName }}"
           {{- end }}
           {{- end }}
-          ports: {{ .Values.container.ports | toYaml | nindent 12 }}
+          ports: {{ .Values.ports | toYaml | nindent 12 }}
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
@@ -224,10 +223,6 @@ spec:
               - key: {{ .Values.outputOpenSearch.tls.caConfigMapKey }}
                 path: {{ .Values.outputOpenSearch.tls.caFileName }}
         {{- end }}
-      {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.affinity }}
       affinity:
