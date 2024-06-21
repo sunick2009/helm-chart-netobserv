@@ -31,19 +31,20 @@ helm install netobserv elastiflow/netobserv
 
 ### License Setup
 
-To configure an ElastiFlow Account ID and License key, you can add the following to your `values.yaml`:
+To configure an ElastiFlow license key, you can add the following to your `values.yaml`:
 
 ```yaml
 license:
   createSecret: true
 ```
 
-Then make sure to use helm's `set` option to configure the account id and license key when installing the chart. For example:
+Then make sure to use helm's `set` option to configure the license key when installing the chart. For example:
 
 ```sh
 helm install netobserv elastiflow/netobserv \
-  --set license.licenseKey="licensekeygoeshere" \
-  --set license.accountId="accountidgoeshere"
+  --set license.licenseKey="licensekeygoeshere"
 ```
 
-For additional configuration secrets, please refer to the [configuration reference guide](https://docs.elastiflow.com/docs/config_ref/).
+For additional kubernetes configuration information, please refer to the comments in the [default values file](./charts/netobserv/values.yaml).
+
+For additional environment configurations, please refer to the [configuration reference guide](https://docs.elastiflow.com/docs/config_ref/).
