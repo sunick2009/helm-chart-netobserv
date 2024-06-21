@@ -157,14 +157,10 @@ service:
   annotations: {}
   # The type of service to create. Available options are ClusterIP (default), NodePort, and LoadBalancer.
   type: ClusterIP
-  # The externalTrafficPolicy field routes external traffic to node-local or cluster-wide endpoints.
-  # There are two available options: Cluster (default) and Local.
-  # Cluster obscures the client source IP and may cause a second hop to another
-  # node, but should have good overall load-spreading.
-  # Local preserves the client source IP and avoids a second hop for
-  # LoadBalancer and NodePort type Services, but risks potentially imbalanced traffic spreading.
+  # The externalTrafficPolicy field routes external traffic to either node-local or cluster-wide endpoints. The two options are:
+  # Cluster (default): Obscures the client source IP, may cause a second hop to another node, but ensures good load-spreading.
+  # Local: Preserves the client source IP, avoids a second hop for LoadBalancer and NodePort Services, but may lead to imbalanced traffic spreading.
   externalTrafficPolicy: Cluster
-  # spec.template.spec.containers[0].ports[0].containerPort: Required value
   ports:
     - name: netflow
       containerPort: 9995
