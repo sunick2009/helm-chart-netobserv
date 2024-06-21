@@ -153,6 +153,20 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
+# The netobserv container's ports to expose.
+container:
+  ports:
+    - name: netflow
+      containerPort: 9995
+      protocol: UDP
+    # - name: ipfix
+    #   containerPort: 4739
+    #   protocol: UDP
+    # - name: sflow
+    #   containerPort: 6343
+    #   protocol: UDP
+
+
 service:
   annotations: {}
   # The type of service to create. Available options are ClusterIP (default), NodePort, and LoadBalancer.
