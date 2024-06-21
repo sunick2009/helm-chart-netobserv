@@ -11,7 +11,7 @@ spec:
   selector:
     matchLabels:
       {{- include "netobserv.selectorLabels" . | nindent 6 }}
-  strategy: {{ with .Values.strategy }}
+  strategy: {{ .Values.strategy | toYaml | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
