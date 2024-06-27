@@ -227,15 +227,15 @@ resources:
     memory: 384Mi
 
 livenessProbe:
-  enabled: false
+  enabled: true
   httpGet:
-    path: /
-    port: http
+    path: /livez
+    port: 8080
 readinessProbe:
-  enabled: false
+  enabled: true
   httpGet:
-    path: /
-    port: http
+    path: /readyz
+    port: 8080
 
 autoscaling:
   enabled: false
