@@ -142,7 +142,7 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled .Values.outputOpenSearch.tls.enabled .Values.extraVolumeMounts }}
+          {{- if include "volumeMountsEnabled" . }}
           volumeMounts:
             {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
             - name: geolite2-data
@@ -195,7 +195,7 @@ spec:
             - name: geolite2-data
               mountPath: /data
         {{- end }}
-      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled .Values.outputOpenSearch.tls.enabled .Values.extraVolumes }}
+      {{- if include "volumesEnabled" . }}
       volumes:
         {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
         - name: geolite2-data
