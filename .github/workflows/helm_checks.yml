@@ -34,11 +34,7 @@ jobs:
           fi
       - name: Run chart-testing (lint)
         if: steps.list-changed.outputs.changed == 'true'
-        run: |
-          helm repo add eck-operator https://helm.elastic.co
-          helm repo add opensearch https://opensearch-project.github.io/helm-charts/
-          helm dep build charts/netobserv
-          ct lint --target-branch ${{ github.event.repository.default_branch }} --validate-maintainers=false
+        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --validate-maintainers=false
 
       - name: Create kind cluster
         if: steps.list-changed.outputs.changed == 'true'

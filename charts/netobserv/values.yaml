@@ -1,11 +1,5 @@
 # Default values for netobserv
 
-opensearch:
-  enabled: false
-
-elasticsearch:
-  enabled: false
-
 replicaCount: 1
 
 # The update strategy to apply to the Deployment.
