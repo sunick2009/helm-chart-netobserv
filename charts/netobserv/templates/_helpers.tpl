@@ -61,17 +61,44 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+
+{{/*
+Manage Volumes via checking if values that require volumes are enabled.
+*/}}
+{{- define "maxmindEnabled" -}}
+  {{- or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled -}}
+{{- end -}}
+
+{{- define "outputKafkaEnabled" -}}
+  {{- .Values.outputKafka.tls.enabled -}}
+{{- end -}}
+
+{{- define "outputElasticsearchEnabled" -}}
+  {{- .Values.outputElasticsearch.tls.enabled -}}
+{{- end -}}
+
+{{- define "outputOpenSearchEnabled" -}}
+  {{- .Values.outputOpenSearch.tls.enabled -}}
+{{- end -}}
+
+{{- define "extraVolumeMountsEnabled" -}}
+  {{- .Values.extraVolumeMounts -}}
+{{- end -}}
+
+{{- define "extraVolumesEnabled" -}}
+  {{- .Values.extraVolumes -}}
+{{- end -}}
+
 {{/*
 Determine if volumes need to be created
 */}}
 {{- define "volumesEnabled" -}}
   {{- or
-    .Values.maxmind.asnEnabled
-    .Values.maxmind.geoipEnabled
-    .Values.outputKafka.tls.enabled
-    .Values.outputElasticsearch.tls.enabled
-    .Values.outputOpenSearch.tls.enabled
-    .Values.extraVolumes
+    (include "maxmindEnabled" .)
+    (include "outputKafkaEnabled" .)
+    (include "outputElasticsearchEnabled" .)
+    (include "outputOpenSearchEnabled" .)
+    (include "extraVolumesEnabled" .)
   -}}
 {{- end -}}
 
@@ -80,11 +107,10 @@ Determine if volumeMounts need to be created
 */}}
 {{- define "volumeMountsEnabled" -}}
   {{- or
-    .Values.maxmind.asnEnabled
-    .Values.maxmind.geoipEnabled
-    .Values.outputKafka.tls.enabled
-    .Values.outputElasticsearch.tls.enabled
-    .Values.outputOpenSearch.tls.enabled
-    .Values.extraVolumeMounts
+    (include "maxmindEnabled" .)
+    (include "outputKafkaEnabled" .)
+    (include "outputElasticsearchEnabled" .)
+    (include "outputOpenSearchEnabled" .)
+    (include "extraVolumeMountsEnabled" .)
   -}}
 {{- end -}}
