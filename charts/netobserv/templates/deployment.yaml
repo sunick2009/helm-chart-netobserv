@@ -11,6 +11,7 @@ spec:
   selector:
     matchLabels:
       {{- include "netobserv.selectorLabels" . | nindent 6 }}
+  strategy: {{ .Values.strategy | toYaml | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -69,6 +70,10 @@ spec:
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{ if .Values.license.accountId }}
+          - name: EF_ACCOUNT_ID
+              value: {{ .Values.license.accountId }}
+          {{- end }}
           {{- if .Values.outputElasticsearch.enabled }}
             - name: EF_OUTPUT_ELASTICSEARCH_ENABLE
               value: 'true'
@@ -88,11 +93,30 @@ spec:
               value: "{{ .Values.outputElasticsearch.tls.caMountPath }}/{{ .Values.outputElasticsearch.tls.caFileName }}"
           {{- end }}
           {{- end }}
+          {{- if .Values.outputOpenSearch.enabled }}
+            - name: EF_OUTPUT_OPENSEARCH_ENABLE
+              value: 'true'
+            - name: EF_OUTPUT_OPENSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.outputOpenSearch.secretRef }}
+                  key: {{ .Values.outputOpenSearch.secretKey }}
+          {{- if .Values.outputOpenSearch.ecs.enabled }}
+            - name: EF_OUTPUT_OPENSEARCH_ECS_ENABLE
+                value: 'true'
+          {{- end }}
+          {{- if .Values.outputOpenSearch.tls.enabled }}
+            - name: EF_OUTPUT_OPENSEARCH_TLS_ENABLE
+              value: 'true'
+            - name: "EF_OUTPUT_OPENSEARCH_TLS_CA_CERT_FILEPATH"
+              value: "{{ .Values.outputOpenSearch.tls.caMountPath }}/{{ .Values.outputOpenSearch.tls.caFileName }}"
+          {{- end }}
+          {{- end }}
           {{- if .Values.license.createSecret }}
             - name: EF_FLOW_LICENSE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: netobserv-license
+                  name: {{ .Values.license.secretRef }}
                   key: license
           {{- end }}
           {{- if .Values.outputKafka.enabled }}
@@ -107,10 +131,7 @@ spec:
               value: "{{ .Values.outputKafka.tls.caMountPath }}/{{ .Values.outputKafka.tls.caFileName }}"
           {{- end }}
           {{- end }}
-          ports:
-            - name: udp
-              containerPort: {{ .Values.service.port }}
-              protocol: UDP
+          ports: {{ .Values.ports | toYaml | nindent 12 }}
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
@@ -121,7 +142,7 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled }}
+          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled .Values.outputOpenSearch.tls.enabled }}
           volumeMounts:
             {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
             - name: geolite2-data
@@ -135,6 +156,11 @@ spec:
             {{- if .Values.outputElasticsearch.tls.enabled }}
             - name: {{ .Values.outputElasticsearch.tls.caConfigMap }}
               mountPath: {{ .Values.outputElasticsearch.tls.caMountPath }}
+              readOnly: True
+            {{- end }}
+            {{- if .Values.outputOpenSearch.tls.enabled }}
+            - name: {{ .Values.outputOpenSearch.tls.caConfigMap }}
+              mountPath: {{ .Values.outputOpenSearch.tls.caMountPath }}
               readOnly: True
             {{- end }}
           {{- end }}
@@ -166,7 +192,7 @@ spec:
             - name: geolite2-data
               mountPath: /data
         {{- end }}
-      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled }}
+      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled .Values.outputOpenSearch.tls.enabled }}
       volumes:
         {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
         - name: geolite2-data
@@ -188,10 +214,14 @@ spec:
               - key: {{ .Values.outputElasticsearch.tls.caConfigMapKey }}
                 path: {{ .Values.outputElasticsearch.tls.caFileName }}
         {{- end }}
-      {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
+        {{- if .Values.outputOpenSearch.tls.enabled }}
+        - name: {{ .Values.outputOpenSearch.tls.caConfigMap }}
+          configMap:
+            name: {{ .Values.outputOpenSearch.tls.caConfigMap }}
+            items:
+              - key: {{ .Values.outputOpenSearch.tls.caConfigMapKey }}
+                path: {{ .Values.outputOpenSearch.tls.caFileName }}
+        {{- end }}
       {{- end }}
       {{- with .Values.affinity }}
       affinity:

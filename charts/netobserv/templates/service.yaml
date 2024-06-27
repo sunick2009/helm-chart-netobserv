@@ -4,12 +4,12 @@ metadata:
   name: {{ include "netobserv.fullname" . }}
   labels:
     {{- include "netobserv.labels" . | nindent 4 }}
+  annotations: {{ .Values.service.annotations | toYaml | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: 9995
-      protocol: UDP
-      name: udp
+  {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
+  {{- end }}
+  ports: {{ .Values.service.ports | toYaml | nindent 4 }}
   selector:
     {{- include "netobserv.selectorLabels" . | nindent 4 }}
