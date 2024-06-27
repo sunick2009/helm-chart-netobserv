@@ -70,7 +70,7 @@ spec:
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{ if .Values.license.accountId }}
+          {{- if .Values.license.accountId }}
           - name: EF_ACCOUNT_ID
               value: {{ .Values.license.accountId }}
           {{- end }}
@@ -142,7 +142,7 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled .Values.outputOpenSearch.tls.enabled }}
+          {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled .Values.outputOpenSearch.tls.enabled .Values.extraVolumeMounts }}
           volumeMounts:
             {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
             - name: geolite2-data
@@ -162,6 +162,9 @@ spec:
             - name: {{ .Values.outputOpenSearch.tls.caConfigMap }}
               mountPath: {{ .Values.outputOpenSearch.tls.caMountPath }}
               readOnly: True
+            {{- end }}
+            {{- if .Values.extraVolumeMounts }}
+              {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
             {{- end }}
           {{- end }}
         {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
@@ -192,7 +195,7 @@ spec:
             - name: geolite2-data
               mountPath: /data
         {{- end }}
-      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled .Values.outputOpenSearch.tls.enabled }}
+      {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled .Values.outputKafka.tls.enabled .Values.outputElasticsearch.tls.enabled .Values.outputOpenSearch.tls.enabled .Values.extraVolumes }}
       volumes:
         {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
         - name: geolite2-data
@@ -222,6 +225,9 @@ spec:
               - key: {{ .Values.outputOpenSearch.tls.caConfigMapKey }}
                 path: {{ .Values.outputOpenSearch.tls.caFileName }}
         {{- end }}
+      {{- end }}
+      {{- if .Values.extraVolumes }}
+        {{- toYaml .Values.extraVolumes | nindent 8 }}
       {{- end }}
       {{- with .Values.affinity }}
       affinity:
