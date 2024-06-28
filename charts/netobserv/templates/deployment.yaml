@@ -195,7 +195,7 @@ spec:
             - name: geolite2-data
               mountPath: /data
         {{- end }}
-      {{- if include "volumesEnabled" . }}
+      {{- if eq (include "volumesEnabled" .) "true" }}
       volumes:
         {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
         - name: geolite2-data
