@@ -142,7 +142,7 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if include "volumeMountsEnabled" . }}
+          {{- if eq (include "volumeMountsEnabled" .) "true" }}
           volumeMounts:
             {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
             - name: geolite2-data
