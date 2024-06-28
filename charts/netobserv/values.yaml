@@ -243,3 +243,18 @@ tolerations: []
 affinity: {}
 
 topologySpreadConstraints: []
+
+extraVolumes: []
+  # - name: example
+  #   emptyDir: {}
+  # - name: storage-volume
+  #   persistentVolumeClaim:
+  #     claimName: example
+
+extraVolumeMounts: []
+  # - name: example
+  #   mountPath: /example
+  # - name: storage-volume
+  #   mountPath: /data
+  #   subPath: ""
+  #   readOnly: true
