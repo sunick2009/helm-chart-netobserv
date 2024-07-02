@@ -242,7 +242,15 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
-  targetMemoryUtilizationPercentage: 80
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
+    # - type: Resource
+    #   resource:
+    #     name: memory
+    #     targetAverageUtilization: 80
   # behavior:
   #   scaleUp:
   #     stabilizationWindowSeconds: 300
@@ -254,17 +262,8 @@ autoscaling:
   #     stabilizationWindowSeconds: 300
   #     policies:
   #       - type: Percent
-  #         value: 100
+  #         value: 10
   #         periodSeconds: 15
-  # metrics:
-  #   - type: Resource
-  #     resource:
-  #       name: cpu
-  #       targetAverageUtilization: 80
-  #   - type: Resource
-  #     resource:
-  #       name: memory
-  #       targetAverageUtilization: 80
 
 tolerations: []
 
