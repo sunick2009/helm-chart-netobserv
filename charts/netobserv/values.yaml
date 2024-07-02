@@ -1,11 +1,5 @@
 # Default values for netobserv
 
-opensearch:
-  enabled: false
-
-elasticsearch:
-  enabled: false
-
 replicaCount: 1
 
 # The update strategy to apply to the Deployment.
@@ -141,6 +135,9 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
+
+# global common labels, applied to all ressources
+commonLabels: {}
 
 podAnnotations: {}
 podLabels: {}
