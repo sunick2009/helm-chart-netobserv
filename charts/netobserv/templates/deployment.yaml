@@ -156,6 +156,10 @@ spec:
               value: 'true'
             - name: "EF_OUTPUT_SPLUNK_HEC_TLS_CA_CERT_FILEPATH"
               value: "{{ .Values.outputSplunkHec.tls.caMountPath }}/{{ .Values.outputSplunkHec.tls.caFileName }}"
+            {{- if .Values.outputSplunkHec.tls.skipVerification }}
+            - name: EF_OUTPUT_SPLUNK_HEC_TLS_SKIP_VERIFICATION
+              value: 'true'
+            {{- end }}
             {{- end }}
           {{- end }}
           ports: {{ .Values.ports | toYaml | nindent 12 }}

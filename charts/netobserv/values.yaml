@@ -115,6 +115,8 @@ outputSplunkHec:
     caConfigMapKey: "ca.crt"
     # The name of the file that contains the CA certificate.
     caFileName: "ca.crt"
+    # Skip verifying the Splunk HEC TLS certificate.
+    skipVerification: false
 
 license:
   # Specifies whether a secret should be created. If you don't have a license, no need to create a license secret.
