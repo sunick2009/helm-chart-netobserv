@@ -23,6 +23,10 @@ jobs:
         with:
           python-version: "3.13"
           check-latest: true
+      - name: Run yamllint
+        run: |
+          pip install yamllint
+          yamllint -c lintconf.yaml .
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.7.0
       - name: Run chart-testing (list-changed)
