@@ -44,6 +44,7 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.maxmind.secretRef }}
                   key: license
+            {{- if or .Values.maxmind.asnEnabled .Values.maxmind.geoipEnabled }}
             - name: GEOIPUPDATE_EDITION_IDS
               {{- if and .Values.maxmind.asnEnabled (not .Values.maxmind.geoipEnabled) }}
               value: "GeoLite2-ASN"
@@ -54,6 +55,7 @@ spec:
               {{- if and .Values.maxmind.geoipEnabled .Values.maxmind.asnEnabled }}
               value: "GeoLite2-ASN GeoLite2-City"
               {{- end }}
+            {{- end }}
             - name: GEOIPUPDATE_DB_DIR
               value: /data
             {{- if .Values.maxmind.geoipEnabled }}
@@ -159,11 +161,12 @@ spec:
           ports: {{ .Values.ports | toYaml | nindent 12 }}
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            {{- toYaml (omit .Values.livenessProbe "enabled") | nindent 12 }}
           {{- end }}
+
           {{- if .Values.readinessProbe.enabled }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            {{- toYaml (omit .Values.readinessProbe "enabled") | nindent 12 }}
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

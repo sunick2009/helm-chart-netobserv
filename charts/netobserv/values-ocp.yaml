@@ -1,0 +1,14 @@
+# Disable default probes to avoid invalid enabled field
+livenessProbe:
+  enabled: false
+readinessProbe:
+  enabled: false
+
+# Restricted SCC requirements
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+  seccompProfile:
+    type: RuntimeDefault
