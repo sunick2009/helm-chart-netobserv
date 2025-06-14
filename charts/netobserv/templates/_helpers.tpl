@@ -69,26 +69,28 @@ Create the name of the service account to use
 Determine if volumes need to be created
 */}}
 {{- define "volumesEnabled" -}}
-  {{- or
-    .Values.maxmind.asnEnabled
-    .Values.maxmind.geoipEnabled
-    .Values.outputKafka.tls.enabled
-    .Values.outputElasticsearch.tls.enabled
-    .Values.outputOpenSearch.tls.enabled
-    (not (empty .Values.extraVolumes))
-  -}}
+    {{- or
+      .Values.maxmind.asnEnabled
+      .Values.maxmind.geoipEnabled
+      .Values.outputKafka.tls.enabled
+      .Values.outputElasticsearch.tls.enabled
+      .Values.outputOpenSearch.tls.enabled
+      .Values.outputSplunkHec.tls.enabled
+      (not (empty .Values.extraVolumes))
+    -}}
 {{- end -}}
 
 {{/*
 Determine if volumeMounts need to be created
 */}}
 {{- define "volumeMountsEnabled" -}}
-  {{- or
-    .Values.maxmind.asnEnabled
-    .Values.maxmind.geoipEnabled
-    .Values.outputKafka.tls.enabled
-    .Values.outputElasticsearch.tls.enabled
-    .Values.outputOpenSearch.tls.enabled
-    (not (empty .Values.extraVolumeMounts))
-  -}}
+    {{- or
+      .Values.maxmind.asnEnabled
+      .Values.maxmind.geoipEnabled
+      .Values.outputKafka.tls.enabled
+      .Values.outputElasticsearch.tls.enabled
+      .Values.outputOpenSearch.tls.enabled
+      .Values.outputSplunkHec.tls.enabled
+      (not (empty .Values.extraVolumeMounts))
+    -}}
 {{- end -}}
