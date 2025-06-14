@@ -90,6 +90,32 @@ outputKafka:
     # The name of the file that contains the CA certificate.
     caFileName: "ca.crt"
 
+# The Splunk output can be used to send records via the Splunk HTTP
+# Event Collector (HEC).
+# https://docs.elastiflow.com/docs/data_platforms/splunk/datainput_and_index
+outputSplunkHec:
+  # Enable/disable the use of the Splunk HEC output.
+  enabled: false
+  # URL of the Splunk HEC endpoint including protocol and port.
+  url: ""
+  # Secret name containing the HEC token.
+  tokenSecretRef: "splunk-hec-token"
+  # The key in the secret that stores the HEC token.
+  tokenSecretKey: token
+  # Optional Splunk index to use when sending events.
+  index: ""
+  tls:
+    # Enable/disable TLS connections to Splunk HEC.
+    enabled: false
+    # The name of the config map that contains the CA certificate.
+    caConfigMap: ""
+    # The path to the CA certificate file.
+    caMountPath: ""
+    # The key in the config map that contains the CA certificate.
+    caConfigMapKey: "ca.crt"
+    # The name of the file that contains the CA certificate.
+    caFileName: "ca.crt"
+
 license:
   # Specifies whether a secret should be created. If you don't have a license, no need to create a license secret.
   createSecret: false

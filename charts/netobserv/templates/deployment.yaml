@@ -135,6 +135,27 @@ spec:
               value: "{{ .Values.outputKafka.tls.caMountPath }}/{{ .Values.outputKafka.tls.caFileName }}"
           {{- end }}
           {{- end }}
+          {{- if .Values.outputSplunkHec.enabled }}
+            - name: EF_OUTPUT_SPLUNK_HEC_ENABLE
+              value: 'true'
+            - name: EF_OUTPUT_SPLUNK_HEC_URL
+              value: {{ .Values.outputSplunkHec.url | quote }}
+            - name: EF_OUTPUT_SPLUNK_HEC_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.outputSplunkHec.tokenSecretRef }}
+                  key: {{ .Values.outputSplunkHec.tokenSecretKey }}
+            {{- if .Values.outputSplunkHec.index }}
+            - name: EF_OUTPUT_SPLUNK_HEC_INDEX
+              value: {{ .Values.outputSplunkHec.index }}
+            {{- end }}
+            {{- if .Values.outputSplunkHec.tls.enabled }}
+            - name: EF_OUTPUT_SPLUNK_HEC_TLS_ENABLE
+              value: 'true'
+            - name: "EF_OUTPUT_SPLUNK_HEC_TLS_CA_CERT_FILEPATH"
+              value: "{{ .Values.outputSplunkHec.tls.caMountPath }}/{{ .Values.outputSplunkHec.tls.caFileName }}"
+            {{- end }}
+          {{- end }}
           ports: {{ .Values.ports | toYaml | nindent 12 }}
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
@@ -165,6 +186,11 @@ spec:
             {{- if .Values.outputOpenSearch.tls.enabled }}
             - name: {{ .Values.outputOpenSearch.tls.caConfigMap }}
               mountPath: {{ .Values.outputOpenSearch.tls.caMountPath }}
+              readOnly: True
+            {{- end }}
+            {{- if .Values.outputSplunkHec.tls.enabled }}
+            - name: {{ .Values.outputSplunkHec.tls.caConfigMap }}
+              mountPath: {{ .Values.outputSplunkHec.tls.caMountPath }}
               readOnly: True
             {{- end }}
             {{- if .Values.extraVolumeMounts }}
@@ -228,6 +254,14 @@ spec:
             items:
               - key: {{ .Values.outputOpenSearch.tls.caConfigMapKey }}
                 path: {{ .Values.outputOpenSearch.tls.caFileName }}
+        {{- end }}
+        {{- if .Values.outputSplunkHec.tls.enabled }}
+        - name: {{ .Values.outputSplunkHec.tls.caConfigMap }}
+          configMap:
+            name: {{ .Values.outputSplunkHec.tls.caConfigMap }}
+            items:
+              - key: {{ .Values.outputSplunkHec.tls.caConfigMapKey }}
+                path: {{ .Values.outputSplunkHec.tls.caFileName }}
         {{- end }}
       {{- end }}
       {{- if .Values.extraVolumes }}
