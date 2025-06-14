@@ -22,9 +22,9 @@ The ElastiFlow Unified Flow Collector receives, decodes, transforms, normalizes,
 ## Installation
 
 ```sh
-helm repo add elastiflow https://elastiflow.github.io/helm-chart-netobserv/
-helm repo update
-helm install netobserv elastiflow/netobserv
+# Replace <org> and <repo> with the appropriate GitHub organization and repository
+helm install netobserv \
+  https://github.com/<org>/<repo>/releases/download/vX.Y.Z/netobserv-X.Y.Z.tgz
 ```
 
 ## Configuration
@@ -41,7 +41,8 @@ license:
 Then make sure to use helm's `set` option to configure the license key when installing the chart. For example:
 
 ```sh
-helm install netobserv elastiflow/netobserv \
+helm install netobserv \
+  https://github.com/<org>/<repo>/releases/download/vX.Y.Z/netobserv-X.Y.Z.tgz \
   --set license.licenseKey="licensekeygoeshere"
 ```
 
