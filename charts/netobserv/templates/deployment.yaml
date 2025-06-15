@@ -180,22 +180,22 @@ spec:
             - name: geolite2-data
               mountPath: /etc/elastiflow/maxmind
             {{- end }}
-            {{- if .Values.outputKafka.tls.enabled }}
+            {{- if and .Values.outputKafka.tls.enabled .Values.outputKafka.tls.caConfigMap .Values.outputKafka.tls.caMountPath }}
             - name: {{ .Values.outputKafka.tls.caConfigMap }}
               mountPath: {{ .Values.outputKafka.tls.caMountPath }}
               readOnly: True
             {{- end }}
-            {{- if .Values.outputElasticsearch.tls.enabled }}
+            {{- if and .Values.outputElasticsearch.tls.enabled .Values.outputElasticsearch.tls.caConfigMap .Values.outputElasticsearch.tls.caMountPath }}
             - name: {{ .Values.outputElasticsearch.tls.caConfigMap }}
               mountPath: {{ .Values.outputElasticsearch.tls.caMountPath }}
               readOnly: True
             {{- end }}
-            {{- if .Values.outputOpenSearch.tls.enabled }}
+            {{- if and .Values.outputOpenSearch.tls.enabled .Values.outputOpenSearch.tls.caConfigMap .Values.outputOpenSearch.tls.caMountPath }}
             - name: {{ .Values.outputOpenSearch.tls.caConfigMap }}
               mountPath: {{ .Values.outputOpenSearch.tls.caMountPath }}
               readOnly: True
             {{- end }}
-            {{- if .Values.outputSplunkHec.tls.enabled }}
+            {{- if and .Values.outputSplunkHec.tls.enabled .Values.outputSplunkHec.tls.caConfigMap .Values.outputSplunkHec.tls.caMountPath }}
             - name: {{ .Values.outputSplunkHec.tls.caConfigMap }}
               mountPath: {{ .Values.outputSplunkHec.tls.caMountPath }}
               readOnly: True
@@ -238,7 +238,7 @@ spec:
         - name: geolite2-data
           emptyDir: {}
         {{- end }}
-        {{- if .Values.outputKafka.tls.enabled }}
+        {{- if and .Values.outputKafka.tls.enabled .Values.outputKafka.tls.caConfigMap .Values.outputKafka.tls.caMountPath }}
         - name: {{ .Values.outputKafka.tls.caConfigMap }}
           configMap:
             name: {{ .Values.outputKafka.tls.caConfigMap }}
@@ -246,7 +246,7 @@ spec:
               - key: {{ .Values.outputKafka.tls.caConfigMapKey }}
                 path: {{ .Values.outputKafka.tls.caFileName }}
         {{- end }}
-        {{- if .Values.outputElasticsearch.tls.enabled }}
+        {{- if and .Values.outputElasticsearch.tls.enabled .Values.outputElasticsearch.tls.caConfigMap .Values.outputElasticsearch.tls.caMountPath }}
         - name: {{ .Values.outputElasticsearch.tls.caConfigMap }}
           configMap:
             name: {{ .Values.outputElasticsearch.tls.caConfigMap }}
@@ -254,7 +254,7 @@ spec:
               - key: {{ .Values.outputElasticsearch.tls.caConfigMapKey }}
                 path: {{ .Values.outputElasticsearch.tls.caFileName }}
         {{- end }}
-        {{- if .Values.outputOpenSearch.tls.enabled }}
+        {{- if and .Values.outputOpenSearch.tls.enabled .Values.outputOpenSearch.tls.caConfigMap .Values.outputOpenSearch.tls.caMountPath }}
         - name: {{ .Values.outputOpenSearch.tls.caConfigMap }}
           configMap:
             name: {{ .Values.outputOpenSearch.tls.caConfigMap }}
@@ -262,7 +262,7 @@ spec:
               - key: {{ .Values.outputOpenSearch.tls.caConfigMapKey }}
                 path: {{ .Values.outputOpenSearch.tls.caFileName }}
         {{- end }}
-        {{- if .Values.outputSplunkHec.tls.enabled }}
+        {{- if and .Values.outputSplunkHec.tls.enabled .Values.outputSplunkHec.tls.caConfigMap .Values.outputSplunkHec.tls.caMountPath }}
         - name: {{ .Values.outputSplunkHec.tls.caConfigMap }}
           configMap:
             name: {{ .Values.outputSplunkHec.tls.caConfigMap }}
