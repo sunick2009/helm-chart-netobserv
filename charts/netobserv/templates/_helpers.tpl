@@ -72,10 +72,10 @@ Determine if volumes need to be created
     {{- or
       .Values.maxmind.asnEnabled
       .Values.maxmind.geoipEnabled
-      .Values.outputKafka.tls.enabled
-      .Values.outputElasticsearch.tls.enabled
-      .Values.outputOpenSearch.tls.enabled
-      .Values.outputSplunkHec.tls.enabled
+      (and .Values.outputKafka.tls.enabled .Values.outputKafka.tls.caConfigMap .Values.outputKafka.tls.caMountPath)
+      (and .Values.outputElasticsearch.tls.enabled .Values.outputElasticsearch.tls.caConfigMap .Values.outputElasticsearch.tls.caMountPath)
+      (and .Values.outputOpenSearch.tls.enabled .Values.outputOpenSearch.tls.caConfigMap .Values.outputOpenSearch.tls.caMountPath)
+      (and .Values.outputSplunkHec.tls.enabled .Values.outputSplunkHec.tls.caConfigMap .Values.outputSplunkHec.tls.caMountPath)
       (not (empty .Values.extraVolumes))
     -}}
 {{- end -}}
@@ -87,10 +87,10 @@ Determine if volumeMounts need to be created
     {{- or
       .Values.maxmind.asnEnabled
       .Values.maxmind.geoipEnabled
-      .Values.outputKafka.tls.enabled
-      .Values.outputElasticsearch.tls.enabled
-      .Values.outputOpenSearch.tls.enabled
-      .Values.outputSplunkHec.tls.enabled
+      (and .Values.outputKafka.tls.enabled .Values.outputKafka.tls.caConfigMap .Values.outputKafka.tls.caMountPath)
+      (and .Values.outputElasticsearch.tls.enabled .Values.outputElasticsearch.tls.caConfigMap .Values.outputElasticsearch.tls.caMountPath)
+      (and .Values.outputOpenSearch.tls.enabled .Values.outputOpenSearch.tls.caConfigMap .Values.outputOpenSearch.tls.caMountPath)
+      (and .Values.outputSplunkHec.tls.enabled .Values.outputSplunkHec.tls.caConfigMap .Values.outputSplunkHec.tls.caMountPath)
       (not (empty .Values.extraVolumeMounts))
     -}}
 {{- end -}}
