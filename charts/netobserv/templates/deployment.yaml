@@ -146,7 +146,7 @@ spec:
           {{- if .Values.outputSplunkHec.enabled }}
             - name: EF_OUTPUT_SPLUNK_HEC_ENABLE
               value: 'true'
-            - name: EF_OUTPUT_SPLUNK_HEC_URL
+            - name: EF_OUTPUT_SPLUNK_HEC_ADDRESSES
               value: {{ .Values.outputSplunkHec.url | quote }}
             - name: EF_OUTPUT_SPLUNK_HEC_TOKEN
               valueFrom:
